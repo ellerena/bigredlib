@@ -1,0 +1,13 @@
+*.o
+*.win
+*.sdf
+*.asm
+*.vhd
+*.tlog
+*.lastbuildstate
+*.idb
+*.opensdf
+*.res
+*/Release/
+*/x64/
+*/Debug/

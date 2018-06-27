@@ -186,9 +186,9 @@ uint32_t BR_Get_RF_as_Image(uint8_t* fp_buffer)
 
 	data_eval.err_cnt = 0;
 	bg_delta = bg_buffer ? (int32_t)(bg_buffer - USB_buf) : 0;
-	i = (F_CNT_RES_4X & br_cntxt.ContextFlags) ? SEN_BLKS_4X : SEN_BLKS_1X;
-	fn_fr_to_img = (i == SEN_BLKS_4X) ? BR_write_RF_block_to_img_4x : BR_write_RF_block_to_img;
-	br_call = (i == SEN_BLKS_4X) ? FN_BR_GETRFDATA_4X : FN_BR_GETRFDATA;
+	i = (F_CNT_RES_4X & br_cntxt.ContextFlags);
+	fn_fr_to_img = (i == F_CNT_RES_4X) ? BR_write_RF_block_to_img_4x : BR_write_RF_block_to_img;
+	br_call = (i == F_CNT_RES_4X) ? FN_BR_GETRFDATA_4X : FN_BR_GETRFDATA;
 	USB_SendCommand(br_call, TAG_F_FB_REQST);
 	block_size = br_cntxt.Block_Depth * br_cntxt.Block_Height * BLK_W * BLK_BPP;
 	do
@@ -200,7 +200,7 @@ uint32_t BR_Get_RF_as_Image(uint8_t* fp_buffer)
 		{
 			bg_delta += block_size;
 		}
-	} while (--i);
+	} while (i--);
 	USB_Rcvd_TAG();									/* get process results from FPGA */
 	*(uint32_t*)&data_eval = *(uint32_t*)USB_buf;	/* copy min and max values to local buffer */
 	return 0;
@@ -211,8 +211,8 @@ uint32_t BR_Get_RF_Data(int16_t *buffer)
 	uint32_t u32Result, i, block_size;
 	uint8_t *oldUsb_buf;
 
-	i = (F_CNT_RES_4X & br_cntxt.ContextFlags) ? SEN_BLKS_4X : SEN_BLKS_1X;
-	USB_SendCommand((i == SEN_BLKS_4X) ? FN_BR_GETRFDATA_4X : FN_BR_GETRFDATA, TAG_F_ALL_OFF);
+	i = (F_CNT_RES_4X & br_cntxt.ContextFlags);
+	USB_SendCommand((i == F_CNT_RES_4X) ? FN_BR_GETRFDATA_4X : FN_BR_GETRFDATA, TAG_F_ALL_OFF);
 	oldUsb_buf = USB_buf;
 	USB_buf = (uint8_t*)buffer;
 	block_size = br_cntxt.Block_Depth * br_cntxt.Block_Height * BLK_W * BLK_BPP;
@@ -225,7 +225,7 @@ uint32_t BR_Get_RF_Data(int16_t *buffer)
 			return u32Result;
 		}
 		USB_buf += block_size;
-	} while (--i);
+	} while (i--);
 	USB_buf = oldUsb_buf;
 	return 0;
 }
@@ -281,15 +281,15 @@ uint32_t BR_Get_RF_Blocks_To_Files(void)
 {
 	uint32_t u32Result, i, block_size;
 
-	i = (F_CNT_RES_4X & br_cntxt.ContextFlags) ? SEN_BLKS_4X : SEN_BLKS_1X;
-	USB_SendCommand((i == SEN_BLKS_4X) ? FN_BR_GETRFDATA_4X : FN_BR_GETRFDATA, TAG_F_ALL_OFF);
+	i = (F_CNT_RES_4X & br_cntxt.ContextFlags);
+	USB_SendCommand((i == F_CNT_RES_4X) ? FN_BR_GETRFDATA_4X : FN_BR_GETRFDATA, TAG_F_ALL_OFF);
 	block_size = br_cntxt.Block_Depth * br_cntxt.Block_Height * BLK_W * BLK_BPP;
 	do
 	{
 		u32Result = USB_Rcvd_TAG();
 		if(u32Result != block_size) return u32Result;
 		BR_write_RF_block_to_file(u32Result);
-	} while (--i);
+	} while (i--);
 	return 0;
 }
 
@@ -454,5 +454,8 @@ void BR_Set_Background(uint32_t state)
 	}
 }
 
-
+uint32_t BR_Get_Tag_Package(void)
+{
+	return USB_Rcvd_TAG();
+}
 

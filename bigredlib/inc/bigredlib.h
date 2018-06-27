@@ -8,9 +8,9 @@
 #define	BRL_PRODUCT		0
 #define	BRL_DESIGN		1
 #ifdef _DEBUG
-#define	BRL_RELEASE		3					/* release number (odd = debug) */
+#define	BRL_RELEASE		5					/* release number (odd = debug) */
 #else
-#define	BRL_RELEASE		2					/* release number (even = release) */
+#define	BRL_RELEASE		4					/* release number (even = release) */
 #endif
 #define	BRL_BUILD		0
 
@@ -80,13 +80,14 @@
 #define	SCOPE_PIX_R		(0)
 #define	SCOPE_PIX_S		(0)
 
-#define	F_CNT_RES_4X	(1 << 1)				/* Context flag: use 4x resolution */
+#define	F_CNT_RES_4X	(SEN_BLKS_4X - 1)				/* Context flag: use 4x resolution */
+#define	F_CNT_RES_1X	(SEN_BLKS_1X - 1)				/* Context flag: use 1x resolution */
 
 #define OUTPUT_FILEPATH	"c:\\"
 #define	OUTPUT_FILENAME	"br_00.txt"
 #define OUTPUT_FILENDX	(sizeof(OUTPUT_FILEPATH OUTPUT_FILENAME) - 7)
 
-#define	INI_PROC_CNTX	{ BLK_W, BLK_H, BLK_D, TWLVE_2_8_LLHH, 0, \
+#define	INI_PROC_CNTX	{ BLK_W, BLK_H, BLK_D, TWLVE_2_8_LLHH, F_CNT_RES_4X, \
 						INI_CEIL, INI_FLOOR, INI_BLKDEF, \
 						SEN_COORD_4X}
 
@@ -164,6 +165,7 @@ BRL_DECLSPEC uint32_t BR_Get_RF_Samples(int16_t *buffer, uint32_t flag);
 BRL_DECLSPEC uint32_t BR_Call_Fn_1Byte(uint32_t fn, uint32_t data, uint32_t flags);
 BRL_DECLSPEC uint32_t BR_Call_Fn(uint32_t fn, uint8_t *arg, uint32_t len, uint32_t flags);
 BRL_DECLSPEC uint32_t BR_Test(int16_t *buffer, uint32_t flag);
+BRL_DECLSPEC uint32_t BR_Get_Tag_Package(void);
 #ifdef __cplusplus
 }
 #endif
